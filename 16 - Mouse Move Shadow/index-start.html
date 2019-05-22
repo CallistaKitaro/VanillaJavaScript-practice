@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mouse Shadow</title>
+</head>
+<body>
+
+  <div class="hero">
+    <h1 contenteditable>🔥WOAH!</h1>
+  </div>
+
+  <style>
+  html {
+    color: black;
+    font-family: sans-serif;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+  }
+
+  h1 {
+    text-shadow: 10px 10px 0 rgba(0,0,0,1);
+    font-size: 100px;
+  }
+  </style>
+
+<script>
+  const hero = document.querySelector('.hero');
+  const text = document.querySelector('h1');
+  const walk = 100;
+
+  function addShadow(e){
+    const {offsetHeight:height, offsetWidth:width} = hero
+    const {offsetLeft:textOffLeft, offsetTop:textOffTop} = text
+    let {offsetX: x, offsetY:y} = e
+    
+    // normalise the x and y such that it does not reset to 0 at <h1>
+    if(e.path[0].localName === 'h1'){
+      x = x + textOffLeft;
+      y = y + textOffTop;
+    }
+
+    const xwalk = Math.round((x/width * walk) - (walk/2))
+    const ywalk = Math.round((y/height * walk) - (walk/2))
+
+    text.style.textShadow = `
+      ${xwalk}px ${ywalk}px 0 red,
+      ${-xwalk}px ${ywalk}px 0 blue,
+      ${xwalk}px ${-ywalk}px 0 green,
+      ${-xwalk}px ${-ywalk}px 0 yellow`;
+  }
+
+  hero.addEventListener('mousemove', addShadow)
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hold Shift to Check Multiple Checkboxes</title>
+</head>
+
+<body>
+  <style>
+
+    html {
+      font-family: sans-serif;
+      background: #ffc600;
+    }
+
+    .inbox {
+      max-width: 400px;
+      margin: 50px auto;
+      background: white;
+      border-radius: 5px;
+      box-shadow: 10px 10px 0 rgba(0,0,0,0.1);
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #F1F1F1;
+    }
+
+    .item:last-child {
+      border-bottom: 0;
+    }
+
+    input:checked + p {
+      background: #F9F9F9;
+      text-decoration: line-through;
+    }
+
+    input[type="checkbox"] {
+      margin: 20px;
+    }
+
+    p {
+      margin: 0;
+      padding: 20px;
+      transition: background 0.2s;
+      flex: 1;
+      font-family:'helvetica neue';
+      font-size: 20px;
+      font-weight: 200;
+      border-left: 1px solid #D1E2FF;
+    }
+  </style>
+  <!--
+   The following is a common layout you would see in an email client.
+
+   When a user clicks a checkbox, holds Shift, and then clicks another checkbox a few rows down, all the checkboxes inbetween those two checkboxes should be checked.
+
+  -->
+  <div class="inbox">
+    <div class="item">
+      <input type="checkbox">
+      <p>This is an inbox layout.</p>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <p>Check one item</p>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <p>Hold down your Shift key</p>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <p>Check a lower item</p>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <p>Everything inbetween should also be set to checked</p>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <p>Try to do it without any libraries</p>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <p>Just regular JavaScript</p>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <p>Good Luck!</p>
+    </div>
+    <div class="item">
+      <input type="checkbox">
+      <p>Don't forget to tweet your result!</p>
+    </div>
+  </div>
+
+  <script>
+    // Instruction unclear. 
+    // Assumption: shift selection will only start from the previously selected checkbox
+    const items = Array.from(document.querySelectorAll(".item"))
+
+    var selectionOrder = []; //Index of the checkboxes currently selected, by order of selection
+    var shiftPressed = false;
+
+    items.forEach(
+      item => {
+        item.firstElementChild.addEventListener("click", function (e) {
+          // Tracking items being clicked
+          var nowChecked = items.indexOf(item); //item currently being clicked
+          if (e.srcElement.checked) {
+            selectionOrder.push(nowChecked);
+          }
+          else {
+            if (selectionOrder.includes(nowChecked)) {
+              console.log("selectionOrder.indexOf(nowChecked)", selectionOrder.indexOf(nowChecked));
+              console.log("nowChecked", nowChecked);
+              selectionOrder.splice(selectionOrder.indexOf(nowChecked), 1)
+            }
+          }
+          console.log('selectionOrder: ', selectionOrder);
+          console.log('nowChecked: ', nowChecked);
+
+          // If shift button is also currently being pressed
+          if (shiftPressed && selectionOrder.length >= 2) {
+            console.log("shifty click")
+            var from = selectionOrder[selectionOrder.length - 2]
+            console.log("from: ", from);
+
+            var to = selectionOrder[selectionOrder.length - 1]
+            console.log('to: ', to);
+
+            if (from > to) { // Bottom checklist is clicked first then the top
+              let temp = from;
+              from = to;
+              to = temp;
+            }
+
+            for (i = from + 1; i < to; i++) {
+              items[i].firstElementChild.checked = true;
+            }
+          }
+        });
+
+        window.addEventListener("keydown", function (e) {
+          if (!e.keyCode === 16) { return }
+          shiftPressed = true;
+        });
+
+        window.addEventListener("keyup", (e) => { shiftPressed = false; });
+      }
+    );
+
+  </script>
+</body>
+
+</html>

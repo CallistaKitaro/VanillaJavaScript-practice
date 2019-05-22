@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State">
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+  <script>
+    const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+
+    const data = []
+    const response = fetch(endpoint)
+      .then(res => res.json()
+        .then(res => data.push(...res)));
+
+    console.log(data);
+
+    // parse thru array of data and return the correct cities as list
+    function findMatches(input, data) {
+      return data.filter(
+        city => city["city"].toLowerCase().includes(input) || city["state"].toLowerCase().includes(input)
+      );
+    }
+    function numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
+    const search = document.querySelectorAll(".search")[0];
+    const suggestions = document.querySelectorAll(".suggestions")[0];
+
+    search.addEventListener("input", function (e) {
+      // get input and track changes
+      let input = e.srcElement.value;
+      console.log(input);
+
+      const matches = findMatches(input, data);
+
+      console.log("suggestion", matches);
+
+      suggestions.innerHTML = matches.map(
+        match => {
+          const regex = new RegExp(input, 'gi')
+          const cityName = match.city.replace(regex, `<span class="hl">${input}</span>`)
+          const stateName = match.state.replace(regex, `<span class="hl">${input}</span>`)
+          return `
+          <li>
+            <span class="name">${cityName}, ${stateName}</span>
+            <span class="population">${numberWithCommas(match.population)}</span>
+          </li>
+          `;
+        }
+      ).join('');
+    });
+
+  </script>
+</body>
+
+</html>
